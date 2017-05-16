@@ -14,29 +14,29 @@
   %=========
   % 中文信息
   %=========
-  ctitle={清华大学学位论文 \LaTeX\ 模板\\使用示例文档 v\version},
+  ctitle={黑白视频自动着色算法},
   cdegree={工学硕士},
-  cdepartment={计算机科学与技术系},
-  cmajor={计算机科学与技术},
-  cauthor={薛瑞尼},
-  csupervisor={郑纬民教授},
-  cassosupervisor={陈文光教授}, % 副指导老师
-  ccosupervisor={某某某教授}, % 联合指导老师
+  cdepartment={软件学院},
+  cmajor={软件工程},
+  cauthor={周立旺},
+  csupervisor={王斌教授},
+  %cassosupervisor={陈文光教授}, % 副指导老师
+  %ccosupervisor={某某某教授}, % 联合指导老师
   % 日期自动使用当前时间，若需指定按如下方式修改：
   % cdate={超新星纪元},
   %
   % 博士后专有部分
-  cfirstdiscipline={计算机科学与技术},
-  cseconddiscipline={系统结构},
-  postdoctordate={2009年7月——2011年7月},
-  id={编号}, % 可以留空： id={},
-  udc={UDC}, % 可以留空
-  catalognumber={分类号}, % 可以留空
+  %cfirstdiscipline={计算机科学与技术},
+  %cseconddiscipline={系统结构},
+  %postdoctordate={2009年7月——2011年7月},
+  %id={编号}, % 可以留空： id={},
+  %udc={UDC}, % 可以留空
+  %catalognumber={分类号}, % 可以留空
   %
   %=========
   % 英文信息
   %=========
-  etitle={An Introduction to \LaTeX{} Thesis Template of Tsinghua University v\version},
+  %etitle={An Introduction to \LaTeX{} Thesis Template of Tsinghua University v\version},
   % 这块比较复杂，需要分情况讨论：
   % 1. 学术型硕士
   %    edegree：必须为Master of Arts或Master of Science（注意大小写）
@@ -52,65 +52,45 @@
   % 4. 专业型博士
   %    edegree：“填写专业学位英文名称全称”
   %    emajor：不填写此项
-  edegree={Doctor of Engineering},
-  emajor={Computer Science and Technology},
-  eauthor={Xue Ruini},
-  esupervisor={Professor Zheng Weimin},
-  eassosupervisor={Chen Wenguang},
+  %edegree={Doctor of Engineering},
+  %emajor={Computer Science and Technology},
+  %eauthor={Xue Ruini},
+  %esupervisor={Professor Zheng Weimin},
+  %eassosupervisor={Chen Wenguang},
   % 日期自动生成，若需指定按如下方式修改：
   % edate={December, 2005}
   %
   % 关键词用“英文逗号”分割
-  ckeywords={\TeX, \LaTeX, CJK, 模板, 论文},
-  ekeywords={\TeX, \LaTeX, CJK, template, thesis}
+  ckeywords={黑白视频, 自动着色, CNN, GAN},
+  ekeywords={Black and white video, Automatic colorization, CNN, GAN}
 }
 
 % 定义中英文摘要和关键字
 \begin{cabstract}
-  论文的摘要是对论文研究内容和成果的高度概括。摘要应对论文所研究的问题及其研究目
-  的进行描述，对研究方法和过程进行简单介绍，对研究成果和所得结论进行概括。摘要应
-  具有独立性和自明性，其内容应包含与论文全文同等量的主要信息。使读者即使不阅读全
-  文，通过摘要就能了解论文的总体内容和主要成果。
+  黑白图像着色是个由来已久且研究得较为成熟的课题，这个课题的任务是将输入的黑白图
+  像还原出它的色彩信息，是图形学领域的一个经典问题。在深度学习普及之前，普遍使用
+  的方法是通过人为指定一些局部颜色信息，然后用最优化的方法补全颜色。而最近几年随
+  着深度学习的广泛应用，许多研究也用深度学习的方法在黑白图像着色问题上做到了自动
+  化，而不需要人工干涉，得到的结果也非常不错。
 
-  论文摘要的书写应力求精确、简明。切忌写成对论文书写内容进行提要的形式，尤其要避
-  免“第 1 章……；第 2 章……；……”这种或类似的陈述方式。
+  黑白视频着色问题相比图像着色问题更难，相关的研究也更少。传统的通过人工干涉的最
+  优化方法有对视频着色的研究，通过将最优化目标由二维扩展到三维上做到；但现在还没
+  有考虑时间连续性的全自动的黑白视频着色算法，这就是本文的研究目标。
 
-  本文介绍清华大学论文模板 \thuthesis{} 的使用方法。本模板符合学校的本科、硕士、
-  博士论文格式要求。
-
-  本文的创新点主要有：
-  \begin{itemize}
-    \item 用例子来解释模板的使用方法；
-    \item 用废话来填充无关紧要的部分；
-    \item 一边学习摸索一边编写新代码。
-  \end{itemize}
-
-  关键词是为了文献标引工作、用以表示全文主要内容信息的单词或术语。关键词不超过 5
-  个，每个关键词中间用分号分隔。（模板作者注：关键词分隔符不用考虑，模板会自动处
-  理。英文关键词同理。）
+  在这篇论文中，我训练了多种对黑白图像着色的GAN模型，训练了多种对视频关键帧着色
+  的GAN模型，处理了视频关键帧之间黑白帧的着色问题。
 \end{cabstract}
 
 % 如果习惯关键字跟在摘要文字后面，可以用直接命令来设置，如下：
 % \ckeywords{\TeX, \LaTeX, CJK, 模板, 论文}
 
 \begin{eabstract}
-   An abstract of a dissertation is a summary and extraction of research work
-   and contributions. Included in an abstract should be description of research
-   topic and research objective, brief introduction to methodology and research
-   process, and summarization of conclusion and contributions of the
-   research. An abstract should be characterized by independence and clarity and
-   carry identical information with the dissertation. It should be such that the
-   general idea and major contributions of the dissertation are conveyed without
-   reading the dissertation.
+   As one of the basic tasks in computer graphics, Black and white image colorization has been a long exist and fully researched task, which aims to restore color information of a gray input image. Before deep learning has been widely applied, a tranditional solution to this problem is using optimization, with local color information manually offered, called user-guided colorization. while with the development of deep learning these years, many new methods have been raised, which deals with automatic image colorization and reaches the state-of-art.
 
-   An abstract should be concise and to the point. It is a misunderstanding to
-   make an abstract an outline of the dissertation and words ``the first
-   chapter'', ``the second chapter'' and the like should be avoided in the
-   abstract.
+   Comparing to image colorization, Black and white video colorization is a harder and less researched problem. Tranditional way of optimization with manual hints can do this by appling 2D objective function to 3D. While there are no mature fully automatic methods of video colorization concerning about time consistency, this paper tries to find a solution.
 
-   Key words are terms used in a dissertation for indexing, reflecting core
-   information of the dissertation. An abstract may contain a maximum of 5 key
-   words, with semi-colons used in between to separate one another.
+   In this paper, I train many image colorization and video key-frames colorzation models based on GAN. Except for that, I also deal with task of colorizing inter-frames between key-frames.
+
 \end{eabstract}
 
 % \ekeywords{\TeX, \LaTeX, CJK, template, thesis}
