@@ -1,7 +1,7 @@
 \chapter{相关工作与预备知识}
 \label{cha:related}
 
-  与本文研究内容相关的工作主要包括三个方面：黑白图像着色、生成对抗网络、最优化。我们将介绍这三个方面的相关工作和本文需要的预备知识。
+  与本文研究内容相关的工作主要包括三个方面：黑白图像着色、生成对抗网络、光流。我们将介绍这三个方面的相关工作和本文需要的预备知识。
 
 \section{黑白图像着色}
 \label{sec:image-color}
@@ -87,3 +87,53 @@
 
 \section{生成对抗网络}
 \label{sec:gan}
+
+  生成对抗网络是一种无监督的机器学习模型，最早由Goodfellow~\cite{DBLP:conf/nips/GoodfellowPMXWOCB14}等人在2014年提出，这种模型多用于数据或图像的自动生成，在最近几年里有大量关于GAN的研究，也出现了很多GAN的变体。生成对抗模型的基本结构如图~\ref{fig:gan}，其思想为同时训练两个神经网络，一个生成器(generator)，一个判别器(discriminator)。输入随机变量到生成器，将期望生成的真实图像与生成器生成的图像混合着输入给判别器，让判别器判断哪些是真实图像哪些是假的图像；通过判别器给出的概率与真实标签的距离更新判别器，同时通过判别器给出的生成器生成图片的真实概率更新生成器。这样两个网络就构成了一种对抗关系，当迭代训练后判别器也难以判断图像的真假，训练好的生成器就可以做图像或数据生成了。
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\paperwidth]{gan}
+    \caption{生成对抗模型}
+    \label{fig:gan}
+  \end{figure}
+
+\subsection{cGAN与wGAN}
+\label{sec:cgan-and-wgan}
+  
+  GAN模型经过几年的发展出现了许多变体，下面介绍对着色问题有用的带条件的生成对抗网络与沃瑟斯坦生成对抗网络。
+
+  cGAN由Mirza~\cite{DBLP:journals/corr/MirzaO14}等人在2014年提出，基本结构如图~\ref{fig:cgan}。其最重要的一点思想就是当网络需要输入一些额外信息时（例如着色问题中的灰度图像），将这个额外信息同时输入给生成器和判别器，而不是只输入到生成器。实验证明，这样的方式可以让生成器与判别器都收敛得更好。
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\paperwidth]{cgan}
+    \caption{带条件的生成对抗模型，y即额外信息}
+    \label{fig:cgan}
+  \end{figure}
+
+  而wGAN的工作则是对原始GAN结构的一些优化，由Arjovsky~\cite{DBLP:journals/corr/ArjovskyCB17}等人2017年提出。我们已经知道GAN是同时训练生成器网络与判别器网络，而且两者的最优化目标是对立的。那么就会有一个平衡二者训练的问题存在：一般情况下，判别器的任务更简单，所以收敛的比生成器就更快，如果判别器早早的就收敛到了很好的状态，生成器怎么更新都无法欺骗判别器，这样生成器的学习就停止了，最后也无法得到好的生成网络。而wGAN就是要解决GAN训练不稳定的问题，他们对原始GAN主要做了4点改动：
+
+  \begin{enumerate}
+    \item 判别器最后一层去掉了sigmoid
+    \item 生成器以及判别器的损失函数不取对数
+    \item 每次更新判别器的参数之后，用一个固定常数将它们的绝对值截断
+    \item 不用基于动量的优化算法
+  \end{enumerate}
+
+  虽然只是几点小小的改动，Arjovsky~\cite{DBLP:journals/corr/ArjovskyB17}等人在另一篇论文中从数学上证明了这样是可以使GAN稳定训练的，而不需要人工控制生成器与判别器的训练比例。
+
+\subsection{变分自编码器}
+\label{sec:vae}
+  
+  对于着色问题而言，我们要通过输入灰色图像得到色度图像输出，而通用的GAN模型中生成器网络的输入是一个噪声向量，所以有必要对生成器网络做一些修改。变分自编码器(VAE)跟GAN一样是非常常用的无监督学习模型，由Kingma~\cite{DBLP:journals/corr/KingmaW13}等人2013年提出。变分自编码器主要由编码器网络与解码器网络组成，如图~\ref{fig:vae}所示，其作用是可以将图片编码为特征向量然后解码出来，为图片变换提供了可能。
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\paperwidth]{vae}
+    \caption{变分自编码器}
+    \label{fig:vae}
+  \end{figure}
+
+\section{光流}
+\label{sec:optical-flow}
+
