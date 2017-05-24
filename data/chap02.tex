@@ -1,15 +1,15 @@
 \chapter{相关工作与预备知识}
-\label{cha:related}
+\label{cha:2-related}
 
   与本文研究内容相关的工作主要包括三个方面：黑白图像着色、生成对抗网络、光流。我们将介绍这三个方面的相关工作和本文需要的预备知识。
 
 \section{黑白图像着色}
-\label{sec:image-color}
+\label{sec:2-image-color}
 
   黑白图像着色问题的研究以深度学习的兴起作为分界点分为两个阶段：计算机辅助阶段与计算机全自动阶段，而这两个阶段中的研究重点，研究方法以及效果也是差异很大。
 
 \subsection{计算机辅助的图像着色}
-\label{sec:user-guided-color}
+\label{sec:2-user-guided-color}
   
   着色是Wilson Markle在1970年提出的一个术语，用于描述给黑白视频或电视节目添加颜色的计算机辅助的过程。之后这个术语被推广到了所有给单色调图像视频添加颜色的范围。
 
@@ -22,7 +22,7 @@
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\paperwidth]{transfer_color}
-    \caption{Welsh等人的风格转换着色。左边是选择的参考彩色图像，中间是待着色图像，右边是风格转化结果}
+    \caption[Welsh等人的风格转换着色]{Welsh等人的风格转换着色。左边是选择的参考彩色图像，中间是待着色图像，右边是风格转化结果}
     \label{fig:transfer}
   \end{figure}
 
@@ -31,14 +31,14 @@
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\paperwidth]{color_optim}
-    \caption{Levin等人的最优化着色。左边是人工添加的彩色条带提示，中间是着色结果，右边是原始真实图像}
+    \caption[Levin等人的最优化着色]{Levin等人的最优化着色。左边是人工添加的彩色条带提示，中间是着色结果，右边是原始真实图像}
     \label{fig:color_optim}
   \end{figure}
 
   不过以上这些计算机辅助着色都有的问题就是需要人工根据经验指定一些区域或像素的颜色，无法完全解放人力。
 
 \subsection{计算机全自动的图像着色}
-\label{sec:automatic-color}
+\label{sec:2-automatic-color}
 
   随着机器学习与深度学习席卷计算机图像、计算机视觉领域的各个研究方向，也出现了许多关于着色问题的数据驱动方法的研究。
 
@@ -86,7 +86,7 @@
   \end{figure}
 
 \section{生成对抗网络}
-\label{sec:gan}
+\label{sec:2-gan}
 
   生成对抗网络是一种无监督的机器学习模型，最早由Goodfellow~\cite{DBLP:conf/nips/GoodfellowPMXWOCB14}等人在2014年提出，这种模型多用于数据或图像的自动生成，在最近几年里有大量关于GAN的研究，也出现了很多GAN的变体。生成对抗模型的基本结构如图~\ref{fig:gan}，其思想为同时训练两个神经网络，一个生成器(generator)，一个判别器(discriminator)。输入随机变量到生成器，将期望生成的真实图像与生成器生成的图像混合着输入给判别器，让判别器判断哪些是真实图像哪些是假的图像；通过判别器给出的概率与真实标签的距离更新判别器，同时通过判别器给出的生成器生成图片的真实概率更新生成器。这样两个网络就构成了一种对抗关系，当迭代训练后判别器也难以判断图像的真假，训练好的生成器就可以做图像或数据生成了。
 
@@ -98,7 +98,7 @@
   \end{figure}
 
 \subsection{cGAN与wGAN}
-\label{sec:cgan-and-wgan}
+\label{sec:2-cgan-and-wgan}
   
   GAN模型经过几年的发展出现了许多变体，下面介绍对着色问题有用的带条件的生成对抗网络与沃瑟斯坦生成对抗网络。
 
@@ -107,7 +107,7 @@
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\paperwidth]{cgan}
-    \caption{带条件的生成对抗模型，y即额外信息}
+    \caption[带条件的生成对抗模型]{带条件的生成对抗模型，y即额外信息}
     \label{fig:cgan}
   \end{figure}
 
@@ -123,7 +123,7 @@
   虽然只是几点小小的改动，Arjovsky~\cite{DBLP:journals/corr/ArjovskyB17}等人在另一篇论文中从数学上证明了这样是可以使GAN稳定训练的，而不需要人工控制生成器与判别器的训练比例。
 
 \subsection{变分自编码器}
-\label{sec:vae}
+\label{sec:2-vae}
   
   对于着色问题而言，我们要通过输入灰色图像得到色度图像输出，而通用的GAN模型中生成器网络的输入是一个噪声向量，所以有必要对生成器网络做一些修改。变分自编码器(VAE)跟GAN一样是非常常用的无监督学习模型，由Kingma~\cite{DBLP:journals/corr/KingmaW13}等人2013年提出。变分自编码器主要由编码器网络与解码器网络组成，如图~\ref{fig:vae}所示，其作用是可以将图片编码为特征向量然后解码出来，为图片变换提供了可能。
 
@@ -135,5 +135,5 @@
   \end{figure}
 
 \section{光流}
-\label{sec:optical-flow}
+\label{sec:2-optical-flow}
 
