@@ -64,7 +64,7 @@
 
   训练的相关参数如表~\ref{tab:3-image-train}。
 
-  \begin{table}[htb]
+  \begin{table}[h]
     \centering
     \begin{minipage}[t]{0.8\linewidth}
     \caption{黑白图像着色GAN训练参数}
@@ -80,13 +80,13 @@
         learn rate D & 判别器学习率 & $5\times10^{-5}$ \\
         learn rate G & 生成器学习率 & $5\times10^{-5}$ \\
         D iterations & 每迭代一次生成器，判别器的迭代次数 & 5 \\
-        clamp & 固定判别器参数的常数 & $\pm0.1$ \\
+        clamp & 固定判别器参数的常数 & $\pm0.01$ \\
         optimizer & 优化函数 & RMSprop \\
         \bottomrule[1.5pt]
       \end{tabularx}
     \end{minipage}
   \end{table}
 
-  下面对训练参数进行一些解释。图像分辨率使用了较低的64x64，因为图像分辨率增大会使得训练困难以及变慢，所以在初期均使用了较低的分辨率，以达到快速学习，验证模型可行性的目的；D iterations参数的意义是在训练的初期多进行判别器的训练，使得判别器一开始处于一个较准确的状态，从而帮助生成器学习；RMSprop优化函数是深度学习的奠基人之一Geoffrey Hinton提出的，其目的是解决Adaptive Gradient中学习速率趋向于0的问题。
+  下面对训练参数进行一些解释。图像分辨率使用了较低的64x64，因为图像分辨率增大会使得训练困难以及变慢，所以在初期均使用了较低的分辨率，以达到快速学习，验证模型可行性的目的；D iterations参数的意义是在训练的初期多进行判别器的训练，使得判别器一开始处于一个较准确的状态，从而帮助生成器学习；RMSprop优化函数是深度学习的奠基人之一Geoffrey Hinton~\cite{Tieleman2012}提出的，其目的是解决Adaptive Gradient中学习速率趋向于0的问题。
 
-  另外，我们已经知道生成器的输入是单通道的灰度图像，输出是双通道的色度图像，在这里我们使用的分别是YUV色彩空间的Y通道与UV通道，训练图像的YUV值均已归一化到[-1,1]。
+  另外，我们已经知道生成器的输入是单通道的灰度图像，输出是双通道的色度图像，在这里我们使用的分别是YUV色彩空间的Y通道与UV通道，训练图像的YUV值均归一化到[-1,1]。
