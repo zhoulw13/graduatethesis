@@ -3,18 +3,123 @@
 
   在这一章中，我们将介绍我们用于对着色后的关键帧在空间和时间上平滑的算法，以及得到关键帧平滑着色后用于给非关键帧着色的算法。
 
+  由于一些原因，我们最后的视频着色并没有使用第~\ref{cha:4-video-color}章中的3D模型，而使用的第~\ref{cha:3-image-color}中的2D着色模型，我们将在第~\ref{cha:6-experiment}章中给出解释。
+
+  所以我们整体算法的流程如下：
+
+  \begin{enumerate}
+    \item 对于输入黑白视频，等间距提取出关键帧；
+    \item 用训练好的二维GAN网络的生成器网络给关键帧着色；
+    \item 分别对每一个关键帧做空间平滑处理；
+    \item 综合所有关键帧，依次对其做时间平滑处理；
+    \item 利用得到的关键帧颜色对非关键帧进行着色。
+    \item 输出着色后的视频
+  \end{enumerate}
+
 \section{关键帧平滑算法}
 \label{sec:5-keyframe-smooth}
-
-  由于一些原因，我们最后的视频着色并没有使用第~\ref{cha:4-video-color}章中的3D模型，而使用的第~\ref{cha:3-image-color}中的2D着色模型，我们将在~\ref{cha:6-experiment}中给出解释。
-
-  所以我们整体算法的流程是
 
 \subsection{空间平滑算法}
 \label{sec:5-spatial-smooth}
 
+  对于一张黑白图像而言，现在的基于学习的自动着色算法输出的着色或多或少都会存在一些空间上的不连续，很容易被人识别出来，所以需要做一个空间平滑的处理。
+
+  我们的空间平滑算法具体如下：输入待平滑彩色图像，遍历其所有像素；对于每个像素，搜索其邻近的像素（在实验中我们取的以该像素为中心的5x5的patch），如果邻近像素的灰度值与该像素的灰度值差在一定范围内（YUV色彩空间中的Y值），则邻近像素视为与原像素属于同物体；搜索完邻近像素后，将所有被视为原像素同物体的像素的色度值取平均值（YUV色彩空间中的UV值），作为该像素新的色度值。
+
+  算法伪代码如下。
+
+  \begin{algorithm}[H]
+  \label{algo:5-spatial-smooth}
+    \caption*{空间平滑算法}
+    \begin{algorithmic}[1]
+      \Require $Y$, $UV$
+      \Ensure  $UV$
+      \Function{spatial smooth}{}
+        \For {pixel $p \in Y$}
+          \State $\Omega = \phi$
+          \For {pixel $\|p^{'} - p\| <= 2$}
+            \If {$\|Y(p) - Y(p^{'})\| < \epsilon$}
+              \State $\Omega = \Omega \cup p^{'}$
+            \EndIf
+          \EndFor
+          \State $UV(p) = mean(UV(\Omega))$
+        \EndFor
+      \EndFunction
+    \end{algorithmic}
+  \end{algorithm}
+
+
 \subsection{时间平滑算法}
 \label{sec:5-temporal-smooth}
 
+  将关键帧依次给着色网络着色病不能保证视频颜色在时间上的稳定性，这一点我们在第~\ref{cha:6-experiment}章中进行了实验。所以在得到每个关键帧的独立着色后，需要对这一系列关键帧的颜色进行平滑，使它们保持一致性。关键帧的稳定是非关键着色稳定的前提，也是视频颜色稳定的前提。
+
+  我们的时间平滑算法如下：输入一系列按时间排序的关键帧彩色图像，设有K帧，对于每个关键帧，做如下处理：用Gunnar~\cite{DBLP:conf/scia/Farneback03}等人2003年提出的光流算法计算关键帧F其与其他$(K-1)$个关键帧之间的光流，这样对关键帧$F$中的每个像素$p$而言，可以找到其在其他关键帧中的$(K-1)$个对应像素，去掉不在图像范围内的，去掉像素灰度值与像素$p$灰度值超过一定阈值的像素，取剩下符合要求像素的色度平均值，作为像素$p$平滑后的色度值。这样对于每个关键帧的每个像素，它们的色度都是比较相近的，排除了着色网络在某些帧会给出与一般情况差别较大的误差。
+
+  算法伪代码如下。
+
+  \begin{algorithm}[H]
+  \label{algo:5-temporal-smooth}
+    \caption*{时间平滑算法}
+    \begin{algorithmic}[1]
+      \Require $Ys$, $UVs$
+      \Ensure  $UVs$
+      \Function{temporal smooth}{}
+        \For {$Y_i \in Ys$}
+          \For {$Y_j \in Ys$}
+            \State $flow = \textbf{calcOpticalFlowFarneback}(Y_i, Y_j)$
+            \For {$p \in Y_i$}
+              \State $p^{'} = p + flow(p)$
+              \If {$\|Y_i(p) - Y_j(p^{'})\| < \epsilon$}
+                \State $\Omega_p = \Omega_p \cup UV_j(p^{'})$
+              \EndIf
+            \EndFor
+          \EndFor
+          \For {$p \in Y_i$}
+            \State $UV_i(p) = mean(\Omega_p)$
+          \EndFor
+        \EndFor
+      \EndFunction
+    \end{algorithmic}
+  \end{algorithm}
+
 \section{非关键帧着色算法}
 \label{sec:5-interframe-color}
+
+  在得到所有关键帧的平滑着色后，就要将关键帧的色度传递到剩余非关键帧。我们的算法采取相邻帧迭代传递色度的方法，即从已着色的关键帧$F_{nk}$开始，用它的颜色传递到它的下一帧$F_{nk+1}$（非关键帧）；当第$F_{nk+1}$帧着色完成时，它又可以作为第$F_{nk+2}$帧的参考帧，将颜色传递给第$F_{nk+2}$帧；重复这个过程，当着色到下一个关键帧$F_{n(k+1)}$时，又可以从这个关键帧开始下一轮颜色传递。
+
+  我们的色彩传递算法具体如下：设前一帧参考帧为$F_p$，待着色的帧为$F_c$，首先计算两帧之间的光流，对于$F_c$中的待着色像素$p_c$而言，在$F_p$中可找到光流对应的像素$p_c^{'}$，另外还有$F_p$中与像素$p_c$同位置的$p_p$，取$p_p$周围3x3的patch的像素$N(p_p)$，然后在像素集合${p_c^{'},N(p_p)}$中找与像素$p_c$灰度值差最小的像素$p^*$，即
+
+  \begin{equation}
+  \label{equ:5-interframe}
+    p^* = \mathop{\arg\min}_{p \in \{p_c^{'},N(p_p)\}} \|Y_c(p_c) - Y_p(p)\|^2
+  \end{equation}
+
+  然后取$p^*$的色度值作为$p_c$的色度值。对$F_c$中的每个像素做如上操作即可完成帧$F_c$的着色。
+
+  算法伪代码如下。
+
+  \begin{algorithm}[H]
+  \label{algo:5-interframe}
+    \caption*{非关键帧着色算法}
+    \begin{algorithmic}[1]
+      \Require $Y_c$, $Y_p$, $UV_p$
+      \Ensure  $UV_c$
+      \Function{color flow}{}
+        \State $flow = \textbf{calcOpticalFlowFarneback}(Y_c, Y_p)$
+        \For {$p_c \in Y_c$}
+          \State $p_c^{'} = p_c + flow(p_c)$
+          \State $\Omega = \{p_c^{'}\}$
+          \For {$\|p - p_c\| < \epsilon$}
+            \State $\Omega = \Omega \cup p$
+          \EndFor
+          \For {$p \in \Omega$}
+            \If {$\|Y_p(p) - Y_c(p_c)\| < min$}
+              \State $p^* = p$
+            \EndIf
+          \EndFor
+          \State $UV_c(p_c) = UV_p(p^*)$
+        \EndFor
+      \EndFunction
+    \end{algorithmic}
+  \end{algorithm}
